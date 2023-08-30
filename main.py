@@ -7,26 +7,48 @@ from openpyxl import load_workbook
 # ;906383022=0249? Fake
 # ;906383024=0249? Real
 
-studentData = ["UserInfo.xlsx","Sheet1"]
-entranceData = ["EntranceInfo.xlsx", "Sheet1"]
+
+studentData = ["UserInfo.xlsx","Sheet1"] # Database of existing inVenTs users
+entranceData = ["EntranceInfo.xlsx", "Sheet1"] # Attendance log sheet
 
 
 while True:
     os.system("cls")
     os.system("clear")
-    pid = input("Swipe your card: ")[1:10]
+    pid = input("Swipe your card: ") # Grabs the 9 digit PID
 
-    if len(pid) != 9:
+    x = time.localtime()
+    currentTime = time.strftime("%H:%M", x)
+    currentDate = date.today()
+
+    if (pid == "QUIT"):
+        checkForDate = pd.read_excel(entranceData[0], sheet_name=entranceData[1])
+        wb1 = load_workbook(entranceData[0])
+        ws1 = wb1[entranceData[1]]
+        currentDate = currentDate.strftime("%Y-%m-%d")
+        checkForDate['Date'] = checkForDate['Date'].astype(str)
+        containsDate = checkForDate[checkForDate['Date']==currentDate]
+        
+
+    
+    pid = pid[1:10]
+
+    if len(pid) !=9: # Return error if the full 9 digits weren't grabbed properly
         print("Card read error try again")
         time.sleep(5)
     else:
         os.system("cls")
         os.system("clear")
+
+        # Load an existing database of student information
+
         data = pd.read_excel(studentData[0], sheet_name=studentData[1])
         wb = load_workbook(studentData[0])
         ws = wb[studentData[1]]
         data['PID'] = data['PID'].astype(str)
         containsPID = data[data['PID']==pid]
+
+        # If the user isn't in the database, create a new user with the following info
 
         if containsPID.empty:
             print("We couldn't find your information please fill out the following (Case Sensitive):")
@@ -45,6 +67,8 @@ while True:
                     ws.cell(row=max_row + row_idx + 1, column=col_idx, value=value)
             wb.save(studentData[0])
 
+        # Grab the information of the existing user otherwise
+
         else:
             firstName = containsPID["First Name"].to_string(index=False)
             lastName = containsPID["Last Name"].to_string(index=False)
@@ -56,9 +80,7 @@ while True:
             sold = containsPID["Soldering"].to_string(index=False)
             pt = containsPID["Power Tools"].to_string(index=False)
 
-        currentDate = date.today()
-        x = time.localtime()
-        currentTime = time.strftime("%H:%M", x)
+        # Load current attendance sheet
 
         checkForSignIn = pd.read_excel(entranceData[0], sheet_name=entranceData[1])
         wb1 = load_workbook(entranceData[0])
