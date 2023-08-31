@@ -1,20 +1,26 @@
 import time
 import os
+import platform
 import pandas as pd
 from datetime import date
 from openpyxl import load_workbook
 
-# ;906383022=0249? Fake
+# ;906383023=0249? Fake
 # ;906383024=0249? Real
 
 
 studentData = ["UserInfo.xlsx","Sheet1"] # Database of existing inVenTs users
 entranceData = ["EntranceInfo.xlsx", "Sheet1"] # Attendance log sheet
 
+opsys = platform.system()
+if opsys == "Windows":
+    clearMethod = "cls"
+else:
+    clearMethod = "clear"
+
 
 while True:
-    os.system("cls")
-    os.system("clear")
+    os.system(clearMethod)
     pid = input("Swipe your card: ") # Grabs the 9 digit PID
 
     x = time.localtime()
@@ -28,17 +34,25 @@ while True:
         currentDate = currentDate.strftime("%Y-%m-%d")
         checkForDate['Date'] = checkForDate['Date'].astype(str)
         containsDate = checkForDate[checkForDate['Date']==currentDate]
-        
 
-    
+        numRows = containsDate.shape[0]
+        
+        for i in range(numRows):
+            currentRow = containsDate.iloc[[i]]
+            if currentRow["Time Out"].to_string(index=False) == "NaN":
+                indexCell = currentRow.index.item() + 2
+                cell = ws1.cell(row=indexCell, column=3)
+                cell.value = currentTime
+                wb1.save(entranceData[0])  
+        exit()
+        
     pid = pid[1:10]
 
     if len(pid) !=9: # Return error if the full 9 digits weren't grabbed properly
         print("Card read error try again")
         time.sleep(5)
     else:
-        os.system("cls")
-        os.system("clear")
+        os.system(clearMethod)
 
         # Load an existing database of student information
 
