@@ -2,6 +2,7 @@ import time
 import os
 import platform
 import pandas as pd
+import helpers as hp
 from datetime import date
 from openpyxl import load_workbook
 
@@ -23,27 +24,11 @@ while True:
     os.system(clearMethod)
     pid = input("Swipe your card: ") # Grabs the 9 digit PID
 
-    x = time.localtime()
-    currentTime = time.strftime("%H:%M", x)
-    currentDate = date.today()
+    currentTime, currentDate = hp.timeDate()
 
     if (pid == "QUIT"):
-        checkForDate = pd.read_excel(entranceData[0], sheet_name=entranceData[1])
-        wb1 = load_workbook(entranceData[0])
-        ws1 = wb1[entranceData[1]]
-        currentDate = currentDate.strftime("%Y-%m-%d")
-        checkForDate['Date'] = checkForDate['Date'].astype(str)
-        containsDate = checkForDate[checkForDate['Date']==currentDate]
-
-        numRows = containsDate.shape[0]
-        
-        for i in range(numRows):
-            currentRow = containsDate.iloc[[i]]
-            if currentRow["Time Out"].to_string(index=False) == "NaN":
-                indexCell = currentRow.index.item() + 2
-                cell = ws1.cell(row=indexCell, column=3)
-                cell.value = currentTime
-                wb1.save(entranceData[0])  
+        checkForDate, wb1, ws1 = hp.loadExcel(entranceData[0],entranceData[1])
+        hp.autoFillSignOut(checkForDate,entranceData[0],ws1,wb1, currentTime, currentDate)
         exit()
         
     pid = pid[1:10]
@@ -55,87 +40,33 @@ while True:
         os.system(clearMethod)
 
         # Load an existing database of student information
-
-        data = pd.read_excel(studentData[0], sheet_name=studentData[1])
-        wb = load_workbook(studentData[0])
-        ws = wb[studentData[1]]
+        data, wb, ws = hp.loadExcel(studentData[0],studentData[1])
         data['PID'] = data['PID'].astype(str)
         containsPID = data[data['PID']==pid]
 
         # If the user isn't in the database, create a new user with the following info
-
         if containsPID.empty:
-            print("We couldn't find your information please fill out the following (Case Sensitive):")
-            firstName = input("First Name: ")
-            lastName = input("Last Name: ")
-            email = input("Email: ")
-            community = input("Community (Galileo, Hypatia, Other, N/A): ")
-            year = input("Year (Freshman, Sophomore, Junior, Senior, Graduate): ")
+            firstName, lastName, email, community, year = hp.addNewUser(pid, studentData[0], ws, wb)
 
-            newData = {"PID": [pid], "First Name": [firstName], "Last Name": [lastName], "Email": [email], "Community": [community],"Year": [year]}
-            newDataFrame = pd.DataFrame(newData)
-            max_row = ws.max_row
-            for row_idx, row in newDataFrame.iterrows():
-                values = row.values
-                for col_idx, value in enumerate(values, start=1):
-                    ws.cell(row=max_row + row_idx + 1, column=col_idx, value=value)
-            wb.save(studentData[0])
-
-        # Grab the information of the existing user otherwise
-
-        else:
-            firstName = containsPID["First Name"].to_string(index=False)
-            lastName = containsPID["Last Name"].to_string(index=False)
-            email = containsPID["Email"].to_string(index=False)
-            community = containsPID["Community"].to_string(index=False)
-            year = containsPID["Year"].to_string(index=False)
-            cnc = containsPID["CNC"].to_string(index=False)
-            lc = containsPID["Laser Cutter"].to_string(index=False)
-            sold = containsPID["Soldering"].to_string(index=False)
-            pt = containsPID["Power Tools"].to_string(index=False)
+        else: # Grab the information of the existing user otherwise
+            firstName, lastName, email, community, year, cnc, lc, sold, pt = hp.grabData(containsPID)
 
         # Load current attendance sheet
-
-        checkForSignIn = pd.read_excel(entranceData[0], sheet_name=entranceData[1])
-        wb1 = load_workbook(entranceData[0])
-        ws1 = wb1[entranceData[1]]
+        checkForSignIn, wb1, ws1 = hp.loadExcel(entranceData[0],entranceData[1])
 
         checkForSignIn['ID Number'] = checkForSignIn['ID Number'].astype(str)
         containsPID2 = checkForSignIn[checkForSignIn['ID Number']==pid]
 
         if containsPID2.empty:
-            print("Signing in")
-            newEntry = {"Date": [currentDate], "Time In": [currentTime], "Time Out": [""], "ID Number": [pid], "First Name": [firstName], "Last Name": [lastName], "Email": [email], "Community": [community],"Year": [year]}
-            newEntryFrame = pd.DataFrame(newEntry)
-            max_row2 = ws1.max_row
-            for row_idx, row in newEntryFrame.iterrows():
-                values = row.values
-                for col_idx, value in enumerate(values, start=1):
-                    ws1.cell(row=max_row2 + row_idx + 1, column=col_idx, value=value)
-            wb1.save(entranceData[0])
+            hp.firstSignIn(currentDate, currentTime, pid, firstName, lastName, email, community, year, ws1, wb1, entranceData[0])
         else:
 
             lastRow = containsPID2.tail(1)
             indexCell = lastRow.index.item() + 2 
 
             if lastRow["Time Out"].to_string(index=False) == "NaN":
-                print("Signing out:", firstName, lastName, "at", currentTime)
-                cell = ws1.cell(row=indexCell, column=3)
-                cell.value = currentTime
-                wb1.save(entranceData[0])
+                hp.signOut(firstName, lastName, currentTime, indexCell, ws1, wb1, entranceData[0])
             else:
-                print("Signing in:", firstName, lastName,"at", currentTime)
-                trainedTools = {"CNC": [cnc], "Laser Cutter": [lc], "Soldering": [sold], "Power Tools": [pt]}
-                dataTrained = pd.DataFrame(trainedTools)
-                print(firstName, "is trained on the following tools:")
-                print(dataTrained)
-                newEntry = {"Date": [currentDate], "Time In": [currentTime], "Time Out": [""], "ID Number": [pid], "First Name": [firstName], "Last Name": [lastName], "Email": [email], "Community": [community],"Year": [year]}
-                newEntryFrame = pd.DataFrame(newEntry)
-                max_row2 = ws1.max_row
-                for row_idx, row in newEntryFrame.iterrows():
-                    values = row.values
-                    for col_idx, value in enumerate(values, start=1):
-                        ws1.cell(row=max_row2 + row_idx + 1, column=col_idx, value=value)
-                wb1.save(entranceData[0])
+                hp.signIn(firstName, lastName, email, community, year, pid, currentTime, currentDate, cnc, lc, sold, pt, ws1, wb1, entranceData[0])
             
-            time.sleep(5)
+        time.sleep(5)
