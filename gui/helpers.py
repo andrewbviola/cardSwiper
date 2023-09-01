@@ -114,8 +114,8 @@ def determineBG(canvas):
         return "#C64600", "white"
     elif canvas == "cardReadErrorCanvas":
         return "#F74242", "black"
-    elif canvas == "fillOutCanvas" or canvas == "signInCanvas":
+    elif canvas == "fillOutCanvas" or canvas == "signInCanvas" or canvas == "signOutCanvas":
         return "#FFE484", "black"
-    elif canvas == "confirmedSignInCanvas":
+    elif canvas == "confirmedSignInCanvas" or canvas == "confirmedSignOutCanvas":
         return "#00C667", "black"
 

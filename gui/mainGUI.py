@@ -4,6 +4,7 @@ import os
 import time
 
 # ;906383023=0249? Fake
+# ;906383055=0249? Not real
 # ;906383024=0249? Real
 
 __location__ = os.path.realpath(
@@ -18,6 +19,7 @@ height = 500
 studentData = ["UserInfo.xlsx","Sheet1"] # Database of existing inVenTs users
 entranceData = ["EntranceInfo.xlsx", "Sheet1"] # Attendance log sheet
 currentCanvas = "mainMenuCanvas"
+fullName = ""
 pid = ""
 firstName = ""
 lastName = ""
@@ -36,6 +38,8 @@ signInCanvas = tk.Canvas(root, width=width, height=height)
 fillOutCanvas = tk.Canvas(root, width=width, height=height)
 cardReadErrorCanvas = tk.Canvas(root, width=width, height=height)
 confirmedSignInCanvas = tk.Canvas(root, width=width, height=height)
+signOutCanvas = tk.Canvas(root, width=width, height=height)
+confirmedSignOutCanvas = tk.Canvas(root, width=width, height=height)
 
 # Photo Buttons
 photo = __location__ + r"\assets\ConfirmBase.png"
@@ -49,22 +53,40 @@ signInCanvas.configure(bg="#FFE484")
 fillOutCanvas.configure(bg="#FFE484")
 cardReadErrorCanvas.configure(bg="#F74242")
 confirmedSignInCanvas.configure(bg="#00C667")
+confirmedSignOutCanvas.configure(bg="#00C667")
+signOutCanvas.configure(bg="#FFE484")
+
 
 # Top Bar
 hp.topBar(mainMenuCanvas,width, height)
+hp.topBar(fillOutCanvas,width, height)
+hp.topBar(confirmedSignInCanvas,width, height)
+hp.topBar(confirmedSignOutCanvas,width, height)
+hp.topBar(signOutCanvas,width, height)
 hp.topMessage(mainMenuCanvas,width,height, "We're glad you're here", "white")
+hp.topMessage(confirmedSignInCanvas,width,height, "Click anywhere to return to the main menu", "black")
+hp.topMessage(confirmedSignOutCanvas,width,height, "Click anywhere to return to the main menu", "black")
 hp.middleMessage(mainMenuCanvas,width,height, "Swipe your Hokie P", "white")
 hp.topBar(signInCanvas,width, height)
 hp.topBar(cardReadErrorCanvas,width, height)
-hp.topMessage(cardReadErrorCanvas,width,height, "Press \"enter\" to return to the main menu", "black")
+hp.topMessage(cardReadErrorCanvas,width,height, "Click anywhere to return to the main menu", "black")
 hp.middleMessage(cardReadErrorCanvas,width,height, "Card Reader Error", "black")
 signInCanvas.create_text(width/2,140,font=("Roboto Mono",42),text="Signing in:",fill="black")
+confirmedSignInCanvas.create_text(width/2,height/2 - 30,font=("Roboto Mono",42),text="Thank you for",fill="black")
+signOutCanvas.create_text(width/2,height/2 - 40,font=("Roboto Mono",42),text="Signing out:",fill="black")
+confirmedSignInCanvas.create_text(width/2,height/2 + 30,font=("Roboto Mono",42),text="signing in!",fill="black")
+confirmedSignOutCanvas.create_text(width/2,height/2 - 30,font=("Roboto Mono",42),text="Thank you for",fill="black")
+confirmedSignOutCanvas.create_text(width/2,height/2 + 30,font=("Roboto Mono",42),text="signing out!",fill="black")
 
 # Buttons
 confirm = tk.Label(signInCanvas, bg="#FFE484", image = confirmBasePhoto, bd = 0)
 confirm.place(x=12.0,y=380.0,width=231.25,height=50.0)
 cancel = tk.Label(signInCanvas, bg="#FFE484", image = cancelBasePhoto, bd = 0)
 cancel.place(x=width-243.25,y=380.0,width=231.25,height=50.0)
+confirm1 = tk.Label(signOutCanvas, bg="#FFE484", image = confirmBasePhoto, bd = 0)
+confirm1.place(x=12.0,y=380.0,width=231.25,height=50.0)
+cancel1 = tk.Label(signOutCanvas, bg="#FFE484", image = cancelBasePhoto, bd = 0)
+cancel1.place(x=width-243.25,y=380.0,width=231.25,height=50.0)
 
 
 # Time and Date
@@ -111,51 +133,72 @@ def swipe(event):
         # If the user isn't in the database, create a new user with the following info
         if containsPID.empty:
             # TODO Implement fill in screen
-            exit()
+            mainMenuCanvas.forget()
+            fillOutCanvas.pack()
+            currentCanvas = "fillOutCanvas"
+            fillOutCanvas.focus_set()
 
         else: # Grab the information of the existing user otherwise
             firstName, lastName, email, community, year, cnc, lc, sold, pt = hp.grabData(containsPID)
+            signInandOut()
             
+def signInandOut():
+    global pid, firstName, lastName, email, community, year, entranceData, cnc, lc, sold, pt, currentCanvas, fullName
+    currentTime, currentDate = hp.timeDate()
     # Load current attendance sheet
-        checkForSignIn, wb1, ws1 = hp.loadExcel(entranceData[0],entranceData[1])
+    checkForSignIn, wb1, ws1 = hp.loadExcel(entranceData[0],entranceData[1])
 
-        checkForSignIn['ID Number'] = checkForSignIn['ID Number'].astype(str)
-        containsPID2 = checkForSignIn[checkForSignIn['ID Number']==pid]
+    checkForSignIn['ID Number'] = checkForSignIn['ID Number'].astype(str)
+    containsPID2 = checkForSignIn[checkForSignIn['ID Number']==pid]
 
-        if containsPID2.empty: # Brand new users won't have trainings use this guy
-            hp.firstSignIn(currentDate, currentTime, pid, firstName, lastName, email, community, year, ws1, wb1, entranceData[0])
-        else:
+    if containsPID2.empty: # Brand new users won't have trainings use this guy
+        hp.firstSignIn(currentDate, currentTime, pid, firstName, lastName, email, community, year, ws1, wb1, entranceData[0])
+    else:
 
-            # Find the last row of the excel sheet with the PID
-            lastRow = containsPID2.tail(1)
-            indexCell = lastRow.index.item() + 2 
+        # Find the last row of the excel sheet with the PID
+        lastRow = containsPID2.tail(1)
+        indexCell = lastRow.index.item() + 2 
 
-            # If the PID exists and there is an available Time Out field, fill that out
-            if lastRow["Time Out"].to_string(index=False) == "NaN":
-                hp.signOut(firstName, lastName, currentTime, indexCell, ws1, wb1, entranceData[0])
-                print("Signed Out")
-            
-            else: # Otherwise make a new row with all the info    
-                mainMenuCanvas.forget()
-                name = firstName + " " + lastName
-                signInCanvas.create_text(width/2,200,font=("Roboto Mono",42),text=name,fill="black")
-                signInCanvas.pack()
-                currentCanvas = "signInCanvas"
-                signInCanvas.focus_set()
+        # If the PID exists and there is an available Time Out field, fill that out
+        if lastRow["Time Out"].to_string(index=False) == "NaN":
+            fullName = firstName + " " + lastName
+            signOutCanvas.create_rectangle(0, height/2-3, width, height/2+50, fill="#FFE484", outline="#FFE484")
+            signOutCanvas.pack()
+            signOutCanvas.create_text(width/2,height/2 + 20,font=("Roboto Mono",42),text=fullName,fill="black")
+            mainMenuCanvas.forget()
+            signOutCanvas.pack()
+            currentCanvas = "signOutCanvas"
+            signOutCanvas.focus_set()
+        
+        else: # Otherwise make a new row with all the info    
+            mainMenuCanvas.forget()
+            fullName = firstName + " " + lastName
+            signInCanvas.create_rectangle(0, height/2-77, width, height/2, fill="#FFE484", outline="#FFE484")
+            signInCanvas.pack()
+            signInCanvas.create_text(width/2,200,font=("Roboto Mono",42),text=fullName,fill="black")
+            signInCanvas.pack()
+            currentCanvas = "signInCanvas"
+            signInCanvas.focus_set()
 
 def returnMain(event):
-    global pid, currentCanvas
-    pid = ""
+    global pid, currentCanvas, firstName, lastName, email, community, year, cnc, lc, sold, pt, fullName
+    pid, firstName, lastName, email, community, year, cnc, lc, sold, pt, fullName = "", "", "", "", "", "", "", "", "", "", ""
     signInCanvas.forget()
+    signOutCanvas.forget()
     confirmedSignInCanvas.forget()
+    confirmedSignOutCanvas.forget()
     mainMenuCanvas.pack()
     currentCanvas = "mainMenuCanvas"
     mainMenuCanvas.focus_set()
     
 def returnFromError(event):
-    global pid, currentCanvas
-    pid = ""
+    global pid, currentCanvas, firstName, lastName, email, community, year, cnc, lc, sold, pt, fullName
+    pid, firstName, lastName, email, community, year, cnc, lc, sold, pt, fullName = "", "", "", "", "", "", "", "", "", "", ""
     cardReadErrorCanvas.forget()
+    confirmedSignInCanvas.forget()
+    confirmedSignOutCanvas.forget()
+    signInCanvas.forget()
+    signOutCanvas.forget()
     mainMenuCanvas.pack()
     currentCanvas = "mainMenuCanvas"
     mainMenuCanvas.focus_set()
@@ -169,15 +212,32 @@ def signInConfirmed():
     confirmedSignInCanvas.pack()
     currentCanvas = "confirmedSignInCanvas"
     confirmedSignInCanvas.focus_set()
-    time.sleep(2)
-    returnMain(True)
+    
+def signOutConfirmed():
+    global currentCanvas, firstName, lastName, email, community, year, pid, cnc, lc, sold, pt, entranceData
+    currentTime, currentDate = hp.timeDate()
+    checkForSignIn, wb1, ws1 = hp.loadExcel(entranceData[0],entranceData[1])
+    checkForSignIn['ID Number'] = checkForSignIn['ID Number'].astype(str)
+    containsPID2 = checkForSignIn[checkForSignIn['ID Number']==pid]
+    lastRow = containsPID2.tail(1)
+    indexCell = lastRow.index.item() + 2 
+    hp.signOut(firstName, lastName, currentTime, indexCell, ws1, wb1, entranceData[0])   
+    signOutCanvas.forget()
+    confirmedSignOutCanvas.pack()
+    currentCanvas = "confirmedSignOutCanvas"
+    confirmedSignOutCanvas.focus_set()
     
 def confirmBut(event):
     if currentCanvas == "signInCanvas":
         signInConfirmed()
+    elif currentCanvas == "signOutCanvas":
+        signOutConfirmed()
 
 def cancelBut(event):
     returnMain(True)
+    
+def test(event):
+    print(event.x, event.y)
     
 clock()
 
@@ -187,9 +247,13 @@ mainMenuCanvas.focus_set()
 
 confirm.bind("<Button-1>", confirmBut)
 cancel.bind("<Button-1>", cancelBut)
+confirm1.bind("<Button-1>", confirmBut)
+cancel1.bind("<Button-1>", cancelBut)
 mainMenuCanvas.bind("<Key>",idNum)
 mainMenuCanvas.bind("<Return>",swipe)
-cardReadErrorCanvas.bind("<Return>",returnFromError)
+cardReadErrorCanvas.bind("<Button-1>",returnFromError)
+confirmedSignOutCanvas.bind("<Button-1>",cancelBut)
+confirmedSignInCanvas.bind("<Button-1>",cancelBut)
 
 # Create a mainloop
 tk.mainloop()
