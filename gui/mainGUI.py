@@ -3,16 +3,12 @@ import helpers as hp
 import os
 import time
 
-# ;906383023=0249? Fake
-# ;906383055=0249? Not real
-# ;906383024=0249? Real
+# ;906383023=0249? Test Test
+# ;906383024=0249? Andrew Viola
+# ;906383055=0249? Fill in user tester
 
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-# Create a root
-root = tk.Tk()
-root.resizable(False, False)
 
 width = 600
 height = 500
@@ -31,6 +27,9 @@ lc = ""
 sold = ""
 pt = ""
 
+# Create a root
+root = tk.Tk()
+root.resizable(False, False)
 
 # Set initial size
 mainMenuCanvas = tk.Canvas(root, width=width, height=height)
