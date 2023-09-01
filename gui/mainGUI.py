@@ -41,10 +41,12 @@ signOutCanvas = tk.Canvas(root, width=width, height=height)
 confirmedSignOutCanvas = tk.Canvas(root, width=width, height=height)
 
 # Photo Buttons
-photo = __location__ + r"\assets\ConfirmBase.png"
+photo = __location__ + r"/assets/ConfirmBase.png"
 confirmBasePhoto = tk.PhotoImage(file=(photo))
-photo = __location__ + r"\assets\CancelBase.png"
+photo = __location__ + r"/assets/CancelBase.png"
 cancelBasePhoto = tk.PhotoImage(file=(photo))
+photo = __location__ + r"/assets/smallTextEntry.png"
+smallTextPhoto = tk.PhotoImage(file=photo)
 
 # Background color
 mainMenuCanvas.configure(bg="#C64600")
@@ -56,7 +58,7 @@ confirmedSignOutCanvas.configure(bg="#00C667")
 signOutCanvas.configure(bg="#FFE484")
 
 
-# Top Bar
+# Text
 hp.topBar(mainMenuCanvas,width, height)
 hp.topBar(fillOutCanvas,width, height)
 hp.topBar(confirmedSignInCanvas,width, height)
@@ -76,6 +78,8 @@ signOutCanvas.create_text(width/2,height/2 - 40,font=("Roboto Mono",42),text="Si
 confirmedSignInCanvas.create_text(width/2,height/2 + 30,font=("Roboto Mono",42),text="signing in!",fill="black")
 confirmedSignOutCanvas.create_text(width/2,height/2 - 30,font=("Roboto Mono",42),text="Thank you for",fill="black")
 confirmedSignOutCanvas.create_text(width/2,height/2 + 30,font=("Roboto Mono",42),text="signing out!",fill="black")
+fillOutCanvas.create_text(width-100,185,font=("Roboto Mono",16),text="Last Name",fill="black")
+fillOutCanvas.create_text(width-(width-70),185,font=("Roboto Mono",16),text="First Name",fill="black")
 
 # Buttons
 confirm = tk.Label(signInCanvas, bg="#FFE484", image = confirmBasePhoto, bd = 0)
@@ -86,6 +90,15 @@ confirm1 = tk.Label(signOutCanvas, bg="#FFE484", image = confirmBasePhoto, bd = 
 confirm1.place(x=12.0,y=380.0,width=231.25,height=50.0)
 cancel1 = tk.Label(signOutCanvas, bg="#FFE484", image = cancelBasePhoto, bd = 0)
 cancel1.place(x=width-243.25,y=380.0,width=231.25,height=50.0)
+
+# Entry Boxes
+lastNameEntryImage  = fillOutCanvas.create_image(width-155+54,223.0,image=smallTextPhoto)
+lastNameEntry = tk.Entry(fillOutCanvas, bd=0,bg="#BA5375",fg="#000716",highlightthickness=0)
+lastNameEntry.place(x=width-155,y=200.0,width=108.0,height=38.0)
+
+firstNameEntryImage  = fillOutCanvas.create_image(width-(width-15)+54,223.0,image=smallTextPhoto)
+firstNameEntry = tk.Entry(fillOutCanvas, bd=0,bg="#BA5375",fg="#000716",highlightthickness=0)
+firstNameEntry.place(x=width-(width-15),y=200.0,width=108.0,height=38.0)
 
 
 # Time and Date
@@ -236,7 +249,9 @@ def cancelBut(event):
     returnMain(True)
     
 def test(event):
-    print(event.x, event.y)
+    global firstName, lastName
+    firstName, lastName = firstNameEntry.get(),lastNameEntry.get()
+    print(firstName,lastName)
     
 clock()
 
@@ -244,6 +259,7 @@ mainMenuCanvas.pack()
 currentCanvas = "mainMenuCanvas"
 mainMenuCanvas.focus_set()
 
+fillOutCanvas.bind("<Button-1>", test)
 confirm.bind("<Button-1>", confirmBut)
 cancel.bind("<Button-1>", cancelBut)
 confirm1.bind("<Button-1>", confirmBut)
