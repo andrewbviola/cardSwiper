@@ -102,7 +102,7 @@ def topMessage(canvas, width, height, message, color):
     canvas.create_text(width/2,90,font=("Roboto Mono",16),text=message,fill=color)
 
 def middleMessage(canvas, width, height, message, color):
-    canvas.create_text(width/2,height/2,font=("Roboto Mono",42),text=message,fill=color)
+    canvas.create_text(width/2,height/2,font=("Roboto Mono",36),text=message,fill=color)
 
 def moveScreen(prevCanvas, nextCanvas):
     prevCanvas.forget()
@@ -114,6 +114,8 @@ def determineBG(canvas):
         return "#C64600", "white"
     elif canvas == "cardReadErrorCanvas":
         return "#F74242", "black"
-    elif canvas == "fillOutCanvas" or "signInCanvas":
+    elif canvas == "fillOutCanvas" or canvas == "signInCanvas":
         return "#FFE484", "black"
+    elif canvas == "confirmedSignInCanvas":
+        return "#00C667", "black"
 

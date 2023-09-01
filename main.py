@@ -57,16 +57,18 @@ while True:
         checkForSignIn['ID Number'] = checkForSignIn['ID Number'].astype(str)
         containsPID2 = checkForSignIn[checkForSignIn['ID Number']==pid]
 
-        if containsPID2.empty:
+        if containsPID2.empty: # Brand new users won't have trainings use this guy
             hp.firstSignIn(currentDate, currentTime, pid, firstName, lastName, email, community, year, ws1, wb1, entranceData[0])
         else:
 
+            # Find the last row of the excel sheet with the PID
             lastRow = containsPID2.tail(1)
             indexCell = lastRow.index.item() + 2 
 
+            # If the PID exists and there is an available Time Out field, fill that out
             if lastRow["Time Out"].to_string(index=False) == "NaN":
                 hp.signOut(firstName, lastName, currentTime, indexCell, ws1, wb1, entranceData[0])
-            else:
+            else: # Otherwise make a new row with all the info
                 hp.signIn(firstName, lastName, email, community, year, pid, currentTime, currentDate, cnc, lc, sold, pt, ws1, wb1, entranceData[0])
             
         time.sleep(5)

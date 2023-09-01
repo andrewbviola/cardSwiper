@@ -3,6 +3,11 @@ import helpers as hp
 import os
 import time
 
+# ;906383023=0249? Fake
+# ;906383024=0249? Real
+
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 # Create a root
 root = tk.Tk()
@@ -30,12 +35,20 @@ mainMenuCanvas = tk.Canvas(root, width=width, height=height)
 signInCanvas = tk.Canvas(root, width=width, height=height)
 fillOutCanvas = tk.Canvas(root, width=width, height=height)
 cardReadErrorCanvas = tk.Canvas(root, width=width, height=height)
+confirmedSignInCanvas = tk.Canvas(root, width=width, height=height)
+
+# Photo Buttons
+photo = __location__ + r"\assets\ConfirmBase.png"
+confirmBasePhoto = tk.PhotoImage(file=(photo))
+photo = __location__ + r"\assets\CancelBase.png"
+cancelBasePhoto = tk.PhotoImage(file=(photo))
 
 # Background color
 mainMenuCanvas.configure(bg="#C64600")
 signInCanvas.configure(bg="#FFE484")
 fillOutCanvas.configure(bg="#FFE484")
 cardReadErrorCanvas.configure(bg="#F74242")
+confirmedSignInCanvas.configure(bg="#00C667")
 
 # Top Bar
 hp.topBar(mainMenuCanvas,width, height)
@@ -45,11 +58,13 @@ hp.topBar(signInCanvas,width, height)
 hp.topBar(cardReadErrorCanvas,width, height)
 hp.topMessage(cardReadErrorCanvas,width,height, "Press \"enter\" to return to the main menu", "black")
 hp.middleMessage(cardReadErrorCanvas,width,height, "Card Reader Error", "black")
-signInCanvas.create_text(width/2,200,font=("Roboto Mono",42),text="Signing in:",fill="black")
+signInCanvas.create_text(width/2,140,font=("Roboto Mono",42),text="Signing in:",fill="black")
 
 # Buttons
-confirm = tk.Button(signInCanvas, padx=20, pady=20)
-confirm.pack()
+confirm = tk.Label(signInCanvas, bg="#FFE484", image = confirmBasePhoto, bd = 0)
+confirm.place(x=12.0,y=380.0,width=231.25,height=50.0)
+cancel = tk.Label(signInCanvas, bg="#FFE484", image = cancelBasePhoto, bd = 0)
+cancel.place(x=width-243.25,y=380.0,width=231.25,height=50.0)
 
 
 # Time and Date
@@ -61,10 +76,10 @@ date.pack()
 def clock():
     color, textColor = hp.determineBG(currentCanvas)
     timer.config(font=("Roboto Mono",24,),text=hp.guiTime(),bg=color,fg=textColor)
-    timer.place(x=width-120,y=height-47)
+    timer.place(x=width-160,y=height-47)
     date.config(font=("Roboto Mono",24,),text=hp.guiDate(),bg=color,fg=textColor)
     date.place(x=width-(width-5),y=height-47)
-    root.after(1000,clock)
+    root.after(250,clock)
     
 def idNum(event):
     global pid
@@ -100,17 +115,39 @@ def swipe(event):
 
         else: # Grab the information of the existing user otherwise
             firstName, lastName, email, community, year, cnc, lc, sold, pt = hp.grabData(containsPID)
-        mainMenuCanvas.forget()
-        name = firstName + " " + lastName
-        signInCanvas.create_text(width/2,height/2,font=("Roboto Mono",42),text=name,fill="black")
-        signInCanvas.pack()
-        currentCanvas = "signInCanvas"
-        signInCanvas.focus_set()
+            
+    # Load current attendance sheet
+        checkForSignIn, wb1, ws1 = hp.loadExcel(entranceData[0],entranceData[1])
+
+        checkForSignIn['ID Number'] = checkForSignIn['ID Number'].astype(str)
+        containsPID2 = checkForSignIn[checkForSignIn['ID Number']==pid]
+
+        if containsPID2.empty: # Brand new users won't have trainings use this guy
+            hp.firstSignIn(currentDate, currentTime, pid, firstName, lastName, email, community, year, ws1, wb1, entranceData[0])
+        else:
+
+            # Find the last row of the excel sheet with the PID
+            lastRow = containsPID2.tail(1)
+            indexCell = lastRow.index.item() + 2 
+
+            # If the PID exists and there is an available Time Out field, fill that out
+            if lastRow["Time Out"].to_string(index=False) == "NaN":
+                hp.signOut(firstName, lastName, currentTime, indexCell, ws1, wb1, entranceData[0])
+                print("Signed Out")
+            
+            else: # Otherwise make a new row with all the info    
+                mainMenuCanvas.forget()
+                name = firstName + " " + lastName
+                signInCanvas.create_text(width/2,200,font=("Roboto Mono",42),text=name,fill="black")
+                signInCanvas.pack()
+                currentCanvas = "signInCanvas"
+                signInCanvas.focus_set()
 
 def returnMain(event):
     global pid, currentCanvas
     pid = ""
     signInCanvas.forget()
+    confirmedSignInCanvas.forget()
     mainMenuCanvas.pack()
     currentCanvas = "mainMenuCanvas"
     mainMenuCanvas.focus_set()
@@ -122,13 +159,34 @@ def returnFromError(event):
     mainMenuCanvas.pack()
     currentCanvas = "mainMenuCanvas"
     mainMenuCanvas.focus_set()
+    
+def signInConfirmed():
+    global currentCanvas, firstName, lastName, email, community, year, pid, cnc, lc, sold, pt, entranceData
+    currentTime, currentDate = hp.timeDate()
+    checkForSignIn, wb1, ws1 = hp.loadExcel(entranceData[0],entranceData[1])
+    hp.signIn(firstName, lastName, email, community, year, pid, currentTime, currentDate, cnc, lc, sold, pt, ws1, wb1, entranceData[0])    
+    signInCanvas.forget()
+    confirmedSignInCanvas.pack()
+    currentCanvas = "confirmedSignInCanvas"
+    confirmedSignInCanvas.focus_set()
+    time.sleep(2)
+    returnMain(True)
+    
+def confirmBut(event):
+    if currentCanvas == "signInCanvas":
+        signInConfirmed()
 
+def cancelBut(event):
+    returnMain(True)
+    
 clock()
 
 mainMenuCanvas.pack()
 currentCanvas = "mainMenuCanvas"
 mainMenuCanvas.focus_set()
 
+confirm.bind("<Button-1>", confirmBut)
+cancel.bind("<Button-1>", cancelBut)
 mainMenuCanvas.bind("<Key>",idNum)
 mainMenuCanvas.bind("<Return>",swipe)
 cardReadErrorCanvas.bind("<Return>",returnFromError)
