@@ -117,6 +117,7 @@ fillOutCanvas.create_text(width-70,285,font=("Roboto Mono",16),text="LLC",fill="
 fillOutCanvas.create_text((width/2),285,font=("Roboto Mono",16),text="Class Year",fill="black")
 fillOutCanvas.create_text(width/2,100,font=("Roboto Mono",36),text="New User",fill="black")
 manualEntryCanvas.create_text(width/2,200,font=("Roboto Mono",36),text="Manual Login",fill="White")
+mainMenuCanvas.create_text(width/2,485,font=("Roboto Mono",8),text="designed by av",fill="White")
 
 # Buttons
 manualEntry = tk.Label(mainMenuCanvas, bg="#C64600", image = plusPhoto, bd = 0)
