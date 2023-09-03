@@ -1,4 +1,4 @@
-# inVenTs cardSwiper
+# cardSwiper
  A fully fleshed out GUI for magstripe ID card reading, built for Virginia Tech's inVenTs Studio.
 
 ### Features:
