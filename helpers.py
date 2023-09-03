@@ -52,6 +52,10 @@ def addNewUser(pid, excelFile, ws, wb):
     saveExcel(excelFile, newData, ws, wb)
     return firstName, lastName, email, community, year
 
+def addNewUserWithData(firstName, lastName, email, community, year, pid, excelFile, ws, wb):
+    newData = {"PID": [pid], "First Name": [firstName], "Last Name": [lastName], "Email": [email], "Community": [community],"Year": [year]}
+    saveExcel(excelFile, newData, ws, wb)
+
 def grabData(dataFrame):
     firstName = dataFrame["First Name"].to_string(index=False)
     lastName = dataFrame["Last Name"].to_string(index=False)
@@ -91,5 +95,31 @@ def guiTime():
 
 def guiDate():
     currentDate = date.today()
-    currentDate = currentDate.strftime("%Y/%m/%d")
+    currentDate = currentDate.strftime("%m/%d/%Y")
     return currentDate
+
+def topBar(canvas, width, height):
+    canvas.create_rectangle(0, 0, width, 50, fill="#861F41", outline="#861F41")
+    canvas.create_text(width/2,25,font=("Roboto Mono",24),text="inVenTs Studio Sign In/Out",fill="white")
+
+def topMessage(canvas, width, height, message, color):
+    canvas.create_text(width/2,90,font=("Roboto Mono",16),text=message,fill=color)
+
+def middleMessage(canvas, width, height, message, color):
+    canvas.create_text(width/2,height/2,font=("Roboto Mono",36),text=message,fill=color)
+
+def moveScreen(prevCanvas, nextCanvas):
+    prevCanvas.forget()
+    nextCanvas.pack()
+    nextCanvas.focus_set()
+
+def determineBG(canvas):
+    if canvas == "mainMenuCanvas" or canvas == "manualEntryCanvas":
+        return "#C64600", "white"
+    elif canvas == "cardReadErrorCanvas":
+        return "#F74242", "black"
+    elif canvas == "fillOutCanvas" or canvas == "signInCanvas" or canvas == "signOutCanvas":
+        return "#FFE484", "black"
+    elif canvas == "confirmedSignInCanvas" or canvas == "confirmedSignOutCanvas":
+        return "#00C667", "black"
+
