@@ -1,7 +1,6 @@
 import tkinter as tk
 import helpers as hp
 import os
-import time
 
 # ;906383023=0249? Test Test
 # ;906383024=0249? Andrew Viola
@@ -346,11 +345,6 @@ def confirmBut(event):
 def cancelBut(event):
     returnMain(True)
     
-def test(event):
-    global firstName, lastName
-    firstName, lastName = firstNameEntry.get(),lastNameEntry.get()
-    print(firstName,lastName)
-    
 def manualEntryCommand(event):
     global currentCanvas
     mainMenuCanvas.forget()
@@ -370,7 +364,6 @@ def manualSignIn(event):
     pid = ""
     pid = pidEntry.get()
     if len(pid) == 9:
-        print(pid)
         manualEntryCanvas.forget()
         pidEntry.delete(0, tk.END)
         swipe(True)

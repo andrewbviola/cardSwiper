@@ -69,21 +69,14 @@ def grabData(dataFrame):
     return firstName, lastName, email, community, year, cnc, lc, sold, pt
 
 def firstSignIn(currentDate, currentTime, pid, firstName, lastName, email, community, year, ws1, wb1, excelFile):
-    print("Signing in")
     newEntry = {"Date": [currentDate], "Time In": [currentTime], "Time Out": [""], "ID Number": [pid], "First Name": [firstName], "Last Name": [lastName], "Email": [email], "Community": [community],"Year": [year]}
     saveExcel(excelFile, newEntry, ws1, wb1)
     
 def signIn(firstName, lastName, email, community, year, pid, currentTime, currentDate, cnc, lc, sold, pt, ws1, wb1, excelFile):
-    print("Signing in:", firstName, lastName,"at", currentTime)
-    trainedTools = {"CNC": [cnc], "Laser Cutter": [lc], "Soldering": [sold], "Power Tools": [pt]}
-    dataTrained = pd.DataFrame(trainedTools)
-    print(firstName, "is trained on the following tools:")
-    print(dataTrained)
     newEntry = {"Date": [currentDate], "Time In": [currentTime], "Time Out": [""], "ID Number": [pid], "First Name": [firstName], "Last Name": [lastName], "Email": [email], "Community": [community],"Year": [year]}
     saveExcel(excelFile, newEntry, ws1, wb1)
     
 def signOut(firstName, lastName, currentTime, indexCell, ws1, wb1, excelFile):
-    print("Signing out:", firstName, lastName, "at", currentTime)
     cell = ws1.cell(row=indexCell, column=3)
     cell.value = currentTime
     wb1.save(excelFile)
