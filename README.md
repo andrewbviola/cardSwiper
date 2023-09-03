@@ -9,10 +9,6 @@
  - Auto sign-out button, signing out everyone in the current day
  - Editable to fit other needs besides being tailored to the inVenTs Studio
 
- ### Bugs?
-
- - Please submit any bugs [here](https://forms.gle/LGzKf4GXjm84UaYy9)
-
 ### Screenshots:
 ![Main Menu](https://github.com/andrewbviola/cardSwiper/blob/main/assets/Screenshots/mainMenu.png)
 
