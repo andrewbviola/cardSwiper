@@ -30,6 +30,7 @@ pt = ""
 # Create a root
 root = tk.Tk()
 root.resizable(False, False)
+root.title("inVenTs Studio Sign In/Out")
 
 # Set initial size
 mainMenuCanvas = tk.Canvas(root, width=width, height=height)
@@ -47,6 +48,23 @@ photo = __location__ + r"/assets/CancelBase.png"
 cancelBasePhoto = tk.PhotoImage(file=(photo))
 photo = __location__ + r"/assets/smallTextEntry.png"
 smallTextPhoto = tk.PhotoImage(file=photo)
+photo = __location__ + r"/assets/CNCicon.png"
+cncPhoto = tk.PhotoImage(file=photo)
+photo = __location__ + r"/assets/LCicon.png"
+lcPhoto = tk.PhotoImage(file=photo)
+photo = __location__ + r"/assets/PTicon.png"
+ptPhoto = tk.PhotoImage(file=photo)
+photo = __location__ + r"/assets/Sicon.png"
+sPhoto = tk.PhotoImage(file=photo)
+photo = __location__ + r"/assets/check.png"
+checkPhoto = tk.PhotoImage(file=photo)
+photo = __location__ + r"/assets/x.png"
+xPhoto = tk.PhotoImage(file=photo)
+photo = __location__ + r"/assets/icon.png"
+iconPhoto = tk.PhotoImage(file=photo)
+
+# Set window icon
+root.iconphoto(False, iconPhoto)
 
 # Background color
 mainMenuCanvas.configure(bg="#C64600")
@@ -72,14 +90,18 @@ hp.topBar(signInCanvas,width, height)
 hp.topBar(cardReadErrorCanvas,width, height)
 hp.topMessage(cardReadErrorCanvas,width,height, "Click anywhere to return to the main menu", "black")
 hp.middleMessage(cardReadErrorCanvas,width,height, "Card Reader Error", "black")
-signInCanvas.create_text(width/2,140,font=("Roboto Mono",42),text="Signing in:",fill="black")
+signInCanvas.create_text(width/2,100,font=("Roboto Mono",42),text="Signing in:",fill="black")
 confirmedSignInCanvas.create_text(width/2,height/2 - 30,font=("Roboto Mono",42),text="Thank you for",fill="black")
 signOutCanvas.create_text(width/2,height/2 - 40,font=("Roboto Mono",42),text="Signing out:",fill="black")
 confirmedSignInCanvas.create_text(width/2,height/2 + 30,font=("Roboto Mono",42),text="signing in!",fill="black")
 confirmedSignOutCanvas.create_text(width/2,height/2 - 30,font=("Roboto Mono",42),text="Thank you for",fill="black")
 confirmedSignOutCanvas.create_text(width/2,height/2 + 30,font=("Roboto Mono",42),text="signing out!",fill="black")
-fillOutCanvas.create_text(width-100,185,font=("Roboto Mono",16),text="Last Name",fill="black")
-fillOutCanvas.create_text(width-(width-70),185,font=("Roboto Mono",16),text="First Name",fill="black")
+fillOutCanvas.create_text(width-70,185,font=("Roboto Mono",16),text="Last Name",fill="black")
+fillOutCanvas.create_text(width-(width-75),185,font=("Roboto Mono",16),text="First Name",fill="black")
+fillOutCanvas.create_text(width-(width-75),285,font=("Roboto Mono",16),text="Email",fill="black")
+fillOutCanvas.create_text(width-70,285,font=("Roboto Mono",16),text="LLC",fill="black")
+fillOutCanvas.create_text((width/2),285,font=("Roboto Mono",16),text="Class Year",fill="black")
+fillOutCanvas.create_text(width/2,100,font=("Roboto Mono",36),text="New User",fill="black")
 
 # Buttons
 confirm = tk.Label(signInCanvas, bg="#FFE484", image = confirmBasePhoto, bd = 0)
@@ -90,16 +112,31 @@ confirm1 = tk.Label(signOutCanvas, bg="#FFE484", image = confirmBasePhoto, bd = 
 confirm1.place(x=12.0,y=380.0,width=231.25,height=50.0)
 cancel1 = tk.Label(signOutCanvas, bg="#FFE484", image = cancelBasePhoto, bd = 0)
 cancel1.place(x=width-243.25,y=380.0,width=231.25,height=50.0)
+confirm2 = tk.Label(fillOutCanvas, bg="#FFE484", image = confirmBasePhoto, bd = 0)
+confirm2.place(x=12.0,y=380.0,width=231.25,height=50.0)
+cancel2 = tk.Label(fillOutCanvas, bg="#FFE484", image = cancelBasePhoto, bd = 0)
+cancel2.place(x=width-243.25,y=380.0,width=231.25,height=50.0)
 
 # Entry Boxes
-lastNameEntryImage  = fillOutCanvas.create_image(width-155+54,223.0,image=smallTextPhoto)
-lastNameEntry = tk.Entry(fillOutCanvas, bd=0,bg="#BA5375",fg="#000716",highlightthickness=0)
-lastNameEntry.place(x=width-155,y=200.0,width=108.0,height=38.0)
-
-firstNameEntryImage  = fillOutCanvas.create_image(width-(width-15)+54,223.0,image=smallTextPhoto)
+firstNameEntryImage  = fillOutCanvas.create_image(width-(width-20)+54,223.0,image=smallTextPhoto)
 firstNameEntry = tk.Entry(fillOutCanvas, bd=0,bg="#BA5375",fg="#000716",highlightthickness=0)
-firstNameEntry.place(x=width-(width-15),y=200.0,width=108.0,height=38.0)
+firstNameEntry.place(x=width-(width-20),y=200.0,width=108.0,height=38.0)
 
+lastNameEntryImage  = fillOutCanvas.create_image(width-123+54,223.0,image=smallTextPhoto)
+lastNameEntry = tk.Entry(fillOutCanvas, bd=0,bg="#BA5375",fg="#000716",highlightthickness=0)
+lastNameEntry.place(x=width-123,y=200.0,width=108.0,height=38.0)
+
+emailEntryImage  = fillOutCanvas.create_image(width-(width-20)+54,323.0,image=smallTextPhoto)
+emailEntry = tk.Entry(fillOutCanvas, bd=0,bg="#BA5375",fg="#000716",highlightthickness=0)
+emailEntry.place(x=width-(width-20),y=300.0,width=108.0,height=38.0)
+
+yearEntryImage  = fillOutCanvas.create_image(width-355+54,323.0,image=smallTextPhoto)
+yearEntry = tk.Entry(fillOutCanvas, bd=0,bg="#BA5375",fg="#000716",highlightthickness=0)
+yearEntry.place(x=width-355,y=300.0,width=108.0,height=38.0)
+
+communityEntryImage  = fillOutCanvas.create_image(width-123+54,323.0,image=smallTextPhoto)
+communityEntry = tk.Entry(fillOutCanvas, bd=0,bg="#BA5375",fg="#000716",highlightthickness=0)
+communityEntry.place(x=width-123,y=300.0,width=108.0,height=38.0)
 
 # Time and Date
 timer = tk.Label(root)
@@ -155,7 +192,7 @@ def swipe(event):
             signInandOut()
             
 def signInandOut():
-    global pid, firstName, lastName, email, community, year, entranceData, cnc, lc, sold, pt, currentCanvas, fullName
+    global pid, firstName, lastName, email, community, year, entranceData, cnc, lc, sold, pt, currentCanvas, fullName, cncPhoto, lcPhoto, sPhoto, ptPhoto, checkPhoto, xPhoto
     currentTime, currentDate = hp.timeDate()
     # Load current attendance sheet
     checkForSignIn, wb1, ws1 = hp.loadExcel(entranceData[0],entranceData[1])
@@ -185,9 +222,29 @@ def signInandOut():
         else: # Otherwise make a new row with all the info    
             mainMenuCanvas.forget()
             fullName = firstName + " " + lastName
-            signInCanvas.create_rectangle(0, height/2-77, width, height/2, fill="#FFE484", outline="#FFE484")
+            signInCanvas.create_rectangle(0, height/2-127, width, height-200, fill="#FFE484", outline="#FFE484")
             signInCanvas.pack()
-            signInCanvas.create_text(width/2,200,font=("Roboto Mono",42),text=fullName,fill="black")
+            signInCanvas.create_image(75,250,image=cncPhoto)
+            signInCanvas.create_image(225,250,image=lcPhoto)
+            signInCanvas.create_image(375,250,image=sPhoto)
+            signInCanvas.create_image(525,250,image=ptPhoto)
+            if cnc == "X":
+                signInCanvas.create_image(75,325,image=checkPhoto)
+            else:
+                signInCanvas.create_image(75,325,image=xPhoto)
+            if lc == "X":
+                signInCanvas.create_image(225,325,image=checkPhoto)
+            else:
+                signInCanvas.create_image(225,325,image=xPhoto)
+            if sold == "X":
+                signInCanvas.create_image(365,325,image=checkPhoto)
+            else:
+                signInCanvas.create_image(365,325,image=xPhoto)
+            if pt == "X":
+                signInCanvas.create_image(530,325,image=checkPhoto)
+            else:
+                signInCanvas.create_image(530,325,image=xPhoto)
+            signInCanvas.create_text(width/2,155,font=("Roboto Mono",42),text=fullName,fill="black")
             signInCanvas.pack()
             currentCanvas = "signInCanvas"
             signInCanvas.focus_set()
@@ -222,6 +279,7 @@ def signInConfirmed():
     hp.signIn(firstName, lastName, email, community, year, pid, currentTime, currentDate, cnc, lc, sold, pt, ws1, wb1, entranceData[0])    
     signInCanvas.forget()
     confirmedSignInCanvas.pack()
+    fillOutCanvas.forget()
     currentCanvas = "confirmedSignInCanvas"
     confirmedSignInCanvas.focus_set()
     
@@ -239,11 +297,20 @@ def signOutConfirmed():
     currentCanvas = "confirmedSignOutCanvas"
     confirmedSignOutCanvas.focus_set()
     
+def fillOutConfirmed():
+    global currentCanvas, firstName, lastName, email, community, year, pid, cnc, lc, sold, pt, entranceData, studentData
+    data, wb, ws = hp.loadExcel(studentData[0],studentData[1])
+    firstName, lastName, email, community, year = firstNameEntry.get(),lastNameEntry.get(), emailEntry.get(), communityEntry.get(), yearEntry.get()
+    hp.addNewUserWithData(firstName, lastName, email, community, year, pid, studentData[0], ws, wb)
+    signInConfirmed()
+    
 def confirmBut(event):
     if currentCanvas == "signInCanvas":
         signInConfirmed()
     elif currentCanvas == "signOutCanvas":
         signOutConfirmed()
+    elif currentCanvas == "fillOutCanvas":
+        fillOutConfirmed()
 
 def cancelBut(event):
     returnMain(True)
@@ -259,11 +326,12 @@ mainMenuCanvas.pack()
 currentCanvas = "mainMenuCanvas"
 mainMenuCanvas.focus_set()
 
-fillOutCanvas.bind("<Button-1>", test)
 confirm.bind("<Button-1>", confirmBut)
 cancel.bind("<Button-1>", cancelBut)
 confirm1.bind("<Button-1>", confirmBut)
 cancel1.bind("<Button-1>", cancelBut)
+confirm2.bind("<Button-1>", confirmBut)
+cancel2.bind("<Button-1>", cancelBut)
 mainMenuCanvas.bind("<Key>",idNum)
 mainMenuCanvas.bind("<Return>",swipe)
 cardReadErrorCanvas.bind("<Button-1>",returnFromError)

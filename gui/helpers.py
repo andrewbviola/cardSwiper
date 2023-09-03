@@ -52,6 +52,10 @@ def addNewUser(pid, excelFile, ws, wb):
     saveExcel(excelFile, newData, ws, wb)
     return firstName, lastName, email, community, year
 
+def addNewUserWithData(firstName, lastName, email, community, year, pid, excelFile, ws, wb):
+    newData = {"PID": [pid], "First Name": [firstName], "Last Name": [lastName], "Email": [email], "Community": [community],"Year": [year]}
+    saveExcel(excelFile, newData, ws, wb)
+
 def grabData(dataFrame):
     firstName = dataFrame["First Name"].to_string(index=False)
     lastName = dataFrame["Last Name"].to_string(index=False)
@@ -91,7 +95,7 @@ def guiTime():
 
 def guiDate():
     currentDate = date.today()
-    currentDate = currentDate.strftime("%Y/%m/%d")
+    currentDate = currentDate.strftime("%m/%d/%Y")
     return currentDate
 
 def topBar(canvas, width, height):
